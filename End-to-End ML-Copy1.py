@@ -23,7 +23,7 @@ import pandas as pd
 #[1] Data
 
 #SOURCE: https://data-usdot.opendata.arcgis.com/datasets/alternative-fueling-stations/explore
-data = pd.read_csv("/Users/anilniraula/Dropbox/My Mac (Anils-MacBook-Pro.local)/Downloads/New Downloads/NHANES_age_prediction.csv")
+data = pd.read_csv("https://github.com/ANiraula/MLapp_diabetic/NHANES_age_prediction.csv")
 data = pd.DataFrame(data)
 data = data.loc[data['DIQ010'] < 3]
 data.loc[data['DIQ010'] == 3]
@@ -34,7 +34,7 @@ data.head()
 
 
 #Exploratory Data Analysis
-print(data.groupby('DIQ010')['age_group','BMXBMI'].value_counts(normalize=True).mul(100).round(1).astype(str) + '%')
+#print(data.groupby('DIQ010')['age_group','BMXBMI'].value_counts(normalize=True).mul(100).round(1).astype(str) + '%')
 
 
 # In[137]:
@@ -64,9 +64,9 @@ data_y = data2['DIQ010']
 data_x = data2.drop(['DIQ010'], axis=1)
 
 X_train, X_test, y_train, y_test = train_test_split(data_x, data_y,test_size = 0.2, random_state=55)
-print(X_train['age_group'].value_counts().sum())
-print(X_test['age_group'].value_counts().sum())
-print(data['age_group'].value_counts().sum())
+#print(X_train['age_group'].value_counts().sum())
+#print(X_test['age_group'].value_counts().sum())
+#print(data['age_group'].value_counts().sum())
 
 
 # In[158]:
@@ -88,13 +88,13 @@ model = SelectFromModel(rf, prefit=True)
 X_train_transformed = model.transform(X_train)
 
 original_features = data2.columns[:-1]
-print(f"Original features: {original_features}")
+#print(f"Original features: {original_features}")
 
 # Select the features deemed important by the SelectFromModel
 features_bool = model.get_support()
 
 selected_features = original_features[features_bool]
-print(f"\nSelected features: {selected_features}")
+#print(f"\nSelected features: {selected_features}")
 
 feature_importance = pd.DataFrame({
     "feature": selected_features,
@@ -127,10 +127,10 @@ X_test_norm = norm.transform(X_test.values.reshape(-1,1))
 y_train_norm = norm.fit_transform(y_train.values.reshape(-1,1))
 y_test_norm = norm.transform(y_test.values.reshape(-1,1))
 
-print(len(X_train_norm))
-print(len(y_train_norm))
-print(len(X_test_norm))
-print(len(y_test_norm))
+#print(len(X_train_norm))
+#print(len(y_train_norm))
+#print(len(X_test_norm))
+#print(len(y_test_norm))
 
 
 # In[197]:
@@ -142,9 +142,9 @@ from sklearn.model_selection import cross_val_score, KFold
 kfold = KFold(n_splits = 5, shuffle=True, random_state=35)
 
 cv_results = cross_val_score(logistic_model, X_train, y_train, cv=kfold, scoring = 'balanced_accuracy')
-print("Model accuracy (5 Kfold splits)")
-print(cv_results)
-print('  ')
+#print("Model accuracy (5 Kfold splits)")
+#print(cv_results)
+#print('  ')
 
 #5.5 continue model accuracy comparison (Confusion Matrix)
 from sklearn.metrics import confusion_matrix
@@ -153,8 +153,8 @@ y_pred = logistic_model.predict(X_train)
 
 # Print confusion matrix
 cm = confusion_matrix(y_train, y_pred)
-print('CONFUSION MATRIX')
-print(cm)
+#print('CONFUSION MATRIX')
+#print(cm)
 
 
 import seaborn as sns
@@ -188,10 +188,10 @@ pred_dummy_prob = logistic_model.predict_proba(pred_dummy)
 
 #Prediction
 pred_dummy_predict = logistic_model.predict(pred_dummy)
-print(pred_dummy)
-print('Prob Diabetic vs. non-Diabetic', pred_dummy_prob)
-print('2. Non-Diabetic: ', pred_dummy_predict) if pred_dummy_predict == 2 else print('1. Diabetic: ', pred_dummy_predict)
-print(pred_dummy['RIDAGEYR'])
+#print(pred_dummy)
+#print('Prob Diabetic vs. non-Diabetic', pred_dummy_prob)
+#print('2. Non-Diabetic: ', pred_dummy_predict) if pred_dummy_predict == 2 else print('1. Diabetic: ', pred_dummy_predict)
+#print(pred_dummy['RIDAGEYR'])
 
 
 # In[199]:
