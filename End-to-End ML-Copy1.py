@@ -23,7 +23,7 @@ import pandas as pd
 #[1] Data
 
 #SOURCE: https://data-usdot.opendata.arcgis.com/datasets/alternative-fueling-stations/explore
-data = pd.read_csv("https://github.com/ANiraula/MLapp_diabetic/NHANES_age_prediction.csv")
+data = pd.read_csv("https://raw.githubusercontent.com/ANiraula/MLapp_diabetic/main/NHANES_age_prediction.csv")
 data = pd.DataFrame(data)
 data = data.loc[data['DIQ010'] < 3]
 data.loc[data['DIQ010'] == 3]
