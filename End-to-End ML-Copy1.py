@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
 #End-to-End ML
 #by Anil Niraula
 
@@ -27,7 +21,7 @@ data = pd.read_csv("https://raw.githubusercontent.com/ANiraula/MLapp_diabetic/ma
 data = pd.DataFrame(data)
 data = data.loc[data['DIQ010'] < 3]
 data.loc[data['DIQ010'] == 3]
-data.head()
+#data.head()
 
 
 # In[136]:
@@ -51,7 +45,7 @@ values = {'SEQN':0, 'age_group':0, 'RIDAGEYR':0, 'RIAGENDR':0, 'PAQ605':0,
                     'BMXBMI':0, 'LBXGLU':0, 'DIQ010':0, 'LBXGLT':0, 'LBXIN':0}
 
 data2.fillna(value=values)
-data2.info()
+#data2.info()
 
 
 # In[173]:
@@ -70,42 +64,6 @@ X_train, X_test, y_train, y_test = train_test_split(data_x, data_y,test_size = 0
 
 
 # In[158]:
-
-
-#[5] Feature selection
-from sklearn.feature_selection import SelectFromModel
-from sklearn.ensemble import RandomForestClassifier
-import matplotlib.pyplot as plt
-
-# Define the random forest model and fit to the training data
-rf = RandomForestClassifier(n_jobs=-1, class_weight='balanced', max_depth=5)
-rf.fit(X_train, y_train)
-
-# Define the feature selection object
-model = SelectFromModel(rf, prefit=True)
-
-# Transform the training features
-X_train_transformed = model.transform(X_train)
-
-original_features = data2.columns[:-1]
-#print(f"Original features: {original_features}")
-
-# Select the features deemed important by the SelectFromModel
-features_bool = model.get_support()
-
-selected_features = original_features[features_bool]
-#print(f"\nSelected features: {selected_features}")
-
-feature_importance = pd.DataFrame({
-    "feature": selected_features,
-    "importance": rf.feature_importances_[features_bool]
-})
-plt.figure(figsize=(10, 6))
-plt.barh(feature_importance["feature"], feature_importance["importance"])
-plt.show()
-
-
-# In[174]:
 
 
 X_train = X_train[['RIDAGEYR', 'LBXGLU','BMXBMI']]
@@ -131,43 +89,6 @@ y_test_norm = norm.transform(y_test.values.reshape(-1,1))
 #print(len(y_train_norm))
 #print(len(X_test_norm))
 #print(len(y_test_norm))
-
-
-# In[197]:
-
-
-#[5.5] Check model accuracy
-
-from sklearn.model_selection import cross_val_score, KFold
-kfold = KFold(n_splits = 5, shuffle=True, random_state=35)
-
-cv_results = cross_val_score(logistic_model, X_train, y_train, cv=kfold, scoring = 'balanced_accuracy')
-#print("Model accuracy (5 Kfold splits)")
-#print(cv_results)
-#print('  ')
-
-#5.5 continue model accuracy comparison (Confusion Matrix)
-from sklearn.metrics import confusion_matrix
-# Get model predictions
-y_pred = logistic_model.predict(X_train)
-
-# Print confusion matrix
-cm = confusion_matrix(y_train, y_pred)
-#print('CONFUSION MATRIX')
-#print(cm)
-
-
-import seaborn as sns
-import matplotlib.pyplot as plt     
-
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-
-cm = confusion_matrix(y_train, y_pred)
-cmd = ConfusionMatrixDisplay(cm, display_labels=['diabetic','non-diabetic'])
-cmd.plot()
-
-
-# In[200]:
 
 
 #[6] Train model
@@ -201,9 +122,11 @@ import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
 
+#app = dash.Dash(__name__)
+#server = app.server
 
 pred_dummy = X_train[0:1]*2
-app.run_server(mode="inline", host="localhost",port=8051)
+app.run_server(mode="inline", host="localhost",port=8055)
 # Initialize the Dash app
 app = dash.Dash(__name__)
 
@@ -261,4 +184,3 @@ def update_output_div(input1, input2, input3, n_clicks):
 # Run the app
 if __name__ == '__main__':
     app.run_server(debug=True)
-
