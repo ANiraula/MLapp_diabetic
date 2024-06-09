@@ -180,7 +180,3 @@ def update_output_div(input1, input2, input3, n_clicks):
 
         return f'* 'f' {result2}'f' *  'f' |  Prob Diabetic vs. non-Diabetic (%) : {result}' 
     return ''
-
-# Run the app
-if __name__ == '__main__':
-    app.run_server(debug=True)
