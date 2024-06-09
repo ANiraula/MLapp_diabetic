@@ -126,10 +126,11 @@ from dash.dependencies import Input, Output
 #server = app.server
 
 pred_dummy = X_train[0:1]*2
-app.run_server(mode="inline", host="localhost",port=8055)
-server = app.server
+#app.run_server(mode="inline", host="localhost",port=8055)
+#server = app.server
 # Initialize the Dash app
 app = dash.Dash(__name__)
+server = app.server
 
 # Define the layout of the app
 app.layout = html.Div([
