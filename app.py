@@ -9,11 +9,16 @@
 #[5] Feature selection
 #[6] Train/fit models
 
+
+# In[135]:
+
+
 import pandas as pd
 #[1] Data
 
 #SOURCE: https://data-usdot.opendata.arcgis.com/datasets/alternative-fueling-stations/explore
 data = pd.read_csv("https://raw.githubusercontent.com/ANiraula/MLapp_diabetic/main/NHANES_age_prediction.csv")
+data = pd.DataFrame(data)
 data = data.loc[data['DIQ010'] < 3]
 data.loc[data['DIQ010'] == 3]
 #data.head()
@@ -30,13 +35,16 @@ data.loc[data['DIQ010'] == 3]
 
 
 #[2] Data cleaning
-data['age_group'] = data['age_group'].astype('category').cat.codes
+data['age_group']= data['age_group'].astype('category')
+data['age_group'] = data['age_group'].cat.codes
 
-# Define which values replace NA with for which columns
-values = {'SEQN': 0, 'age_group': 0, 'RIDAGEYR': 0, 'RIAGENDR': 0, 'PAQ605': 0,
-          'BMXBMI': 0, 'LBXGLU': 0, 'DIQ010': 0, 'LBXGLT': 0, 'LBXIN': 0}
+# fillNA
+data2 = data
+#Define which values replace NA with for which columns
+values = {'SEQN':0, 'age_group':0, 'RIDAGEYR':0, 'RIAGENDR':0, 'PAQ605':0,
+                    'BMXBMI':0, 'LBXGLU':0, 'DIQ010':0, 'LBXGLT':0, 'LBXIN':0}
 
-data.fillna(value=values, inplace=True)
+data2.fillna(value=values)
 #data2.info()
 
 
@@ -46,8 +54,8 @@ data.fillna(value=values, inplace=True)
 #[3] Tarin/test split
 
 from sklearn.model_selection import train_test_split
-data_y = data['DIQ010']
-data_x = data.drop(['DIQ010'], axis=1)
+data_y = data2['DIQ010']
+data_x = data2.drop(['DIQ010'], axis=1)
 
 X_train, X_test, y_train, y_test = train_test_split(data_x, data_y,test_size = 0.2, random_state=55)
 #print(X_train['age_group'].value_counts().sum())
@@ -69,9 +77,13 @@ X_test = X_test[['RIDAGEYR', 'LBXGLU','BMXBMI']]
 
 from sklearn.preprocessing import MinMaxScaler
 norm = MinMaxScaler()
+X_train_norm = norm.fit_transform(X_train.values.reshape(-1,1))
 
-X_train_norm = norm.fit_transform(X_train)
-X_test_norm = norm.transform(X_test)
+# Use the same normalizer to transform the 'age' column of the test set to avoid data leakage
+X_test_norm = norm.transform(X_test.values.reshape(-1,1))
+
+y_train_norm = norm.fit_transform(y_train.values.reshape(-1,1))
+y_test_norm = norm.transform(y_test.values.reshape(-1,1))
 
 #print(len(X_train_norm))
 #print(len(y_train_norm))
@@ -81,20 +93,21 @@ X_test_norm = norm.transform(X_test)
 
 #[6] Train model
 from sklearn.linear_model import LogisticRegression
+import numpy as np
 
-# Create model
-logistic_model = LogisticRegression(max_iter=300, class_weight='balanced')
+#Create model
+logistic_model = LogisticRegression(max_iter=300, class_weight = 'balanced')
+#Train
+logistic_model.fit(X_train , np.ravel(y_train,order='C'))
 
-# Train
-logistic_model.fit(X_train_norm, y_train)
+#Create dummy input (age, clucose & BMI)
+pred_dummy = X_train[0:1]*1.5
+#print(pred_dummy)
 
-# Create dummy input (age, glucose & BMI)
-pred_dummy = X_train_norm[0:1] * 1.5
-
-# Prediction probabilities
+#Prediction probabilities
 pred_dummy_prob = logistic_model.predict_proba(pred_dummy)
 
-# Prediction
+#Prediction
 pred_dummy_predict = logistic_model.predict(pred_dummy)
 #print(pred_dummy)
 #print('Prob Diabetic vs. non-Diabetic', pred_dummy_prob)
@@ -113,11 +126,9 @@ from dash.dependencies import Input, Output
 #server = app.server
 
 pred_dummy = X_train[0:1]*2
-#app.run_server(mode="inline", host="localhost",port=8055)
-#server = app.server
+app.run_server(mode="inline", host="localhost",port=8054)
 # Initialize the Dash app
 app = dash.Dash(__name__)
-server = app.server
 
 # Define the layout of the app
 app.layout = html.Div([
