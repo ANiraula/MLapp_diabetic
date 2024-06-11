@@ -123,11 +123,12 @@ from dash import dcc, html
 from dash.dependencies import Input, Output
 
 #app = dash.Dash(__name__)
-#server = app.server
+
 
 pred_dummy = X_train[0:1]*2
 # Initialize the Dash app
 app = dash.Dash(__name__)
+server = app.server
 
 # Define the layout of the app
 app.layout = html.Div([
